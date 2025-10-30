@@ -2,6 +2,7 @@
 
 uniform sampler2D gtexture;
 uniform sampler2D lightmap;
+uniform mat4 gbufferModelViewInverse;
 
 /* DRAWBUFFERS:0 */
 layout(location = 0) out vec4 outColor0;
@@ -9,8 +10,11 @@ layout(location = 0) out vec4 outColor0;
 in vec2 texCoord;
 in vec3 foliageColor;
 in vec2 lightMapCoords;
+in vec3 geoNormal;
 
 void main() {
+
+    vec3 worldGeoNormal = mat3(gbufferModelViewInverse) * geoNormal;
 
     vec3 lightColor = pow(texture(lightmap, lightMapCoords).rgb, vec3(2.2));
 
@@ -21,5 +25,6 @@ void main() {
     if (transparency < .1) {
         discard;
     }
-    outColor0 = pow(vec4(outputColor, transparency), vec4(1.0 / 2.2));
+    // outColor0 = pow(vec4(outputColor, transparency), vec4(1.0 / 2.2));
+    outColor0 = vec4(worldGeoNormal, transparency);
 }
