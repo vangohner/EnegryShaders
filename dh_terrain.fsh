@@ -9,6 +9,10 @@ uniform float viewWidth;
 
 uniform vec3 fogColor;
 
+uniform mat4 gbufferModelViewInverse;
+
+uniform vec3 shadowLightPosition;
+
 /* DRAWBUFFERS:0 */
 layout(location = 0) out vec4 outColor0;
 
@@ -19,7 +23,11 @@ in vec3 geoNormal;
 
 void main() {
 
-    vec3 worldGeoNormal = mat3(gl_ModelViewMatrixInverse) * geoNormal;
+    vec3 shadowDirection = normalize(mat3(gbufferModelViewInverse) * shadowLightPosition);
+
+    vec3 worldGeoNormal = mat3(gbufferModelViewInverse) * geoNormal;
+
+    float lightBrightness = clamp(dot(shadowDirection, worldGeoNormal), 0.2, 1.0);
 
     vec3 lightColor = pow(texture(lightmap, lightMapCoords).rgb, vec3(2.2));
 
@@ -36,6 +44,8 @@ void main() {
         discard;
     }
 
+    outputColor *= lightBrightness;
+
     float distanceFromCamera = distance(vec3(0), viewSpacePosition);
 
     float maxFogDistance = 4000;
@@ -45,6 +55,5 @@ void main() {
 
     outputColor = mix(outputColor, pow(fogColor, vec3(2.2)), fogBlendValue);
 
-    // outColor0 = pow(vec4(outputColor, transparency), vec4(1.0 / 2.2));
-    outColor0 = vec4(worldGeoNormal, transparency);
+    outColor0 = pow(vec4(outputColor, transparency), vec4(1.0 / 2.2));
 }
