@@ -5,8 +5,11 @@ uniform mat4 dhProjection;
 out vec4 blockColor;
 out vec2 lightMapCoords;
 out vec3 viewSpacePosition;
+out vec3 geoNormal;
 
 void main() {
+
+    geoNormal = gl_NormalMatrix * gl_Normal;
 
     blockColor = gl_Color;
 

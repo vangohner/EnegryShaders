@@ -15,8 +15,11 @@ layout(location = 0) out vec4 outColor0;
 in vec4 blockColor;
 in vec2 lightMapCoords;
 in vec3 viewSpacePosition;
+in vec3 geoNormal;
 
 void main() {
+
+    vec3 worldGeoNormal = mat3(gl_ModelViewMatrixInverse) * geoNormal;
 
     vec3 lightColor = pow(texture(lightmap, lightMapCoords).rgb, vec3(2.2));
 
@@ -42,5 +45,6 @@ void main() {
 
     outputColor = mix(outputColor, pow(fogColor, vec3(2.2)), fogBlendValue);
 
-    outColor0 = pow(vec4(outputColor, transparency), vec4(1.0 / 2.2));
+    // outColor0 = pow(vec4(outputColor, transparency), vec4(1.0 / 2.2));
+    outColor0 = vec4(worldGeoNormal, transparency);
 }
